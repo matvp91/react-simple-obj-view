@@ -10,6 +10,7 @@ const datasets = {
     nully: null,
     notdef: undefined,
     isnan: NaN,
+    isbool: true,
     func: () => {
       console.log('I is func');
     },

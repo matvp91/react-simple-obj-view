@@ -56,6 +56,9 @@ const styles = {
     padding: '1px 2px',
     borderRadius: 3,
   },
+  'value-boolean': {
+    color: 'rgb(42, 161, 152)',
+  },
 };
 
 function getType(value) {
