@@ -1,22 +1,196 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { useRef } from 'react';
 
-import styles from './styles.css'
+function getType(value) {
+  let type = typeof value;
 
-export default class ExampleComponent extends Component {
-  static propTypes = {
-    text: PropTypes.string
+  // Transform edge cases.
+  if (value === null) {
+    type = 'null';
+  } else if (value === undefined) {
+    type = 'undefined';
+  } else if (Array.isArray(value)) {
+    type = 'array';
   }
 
-  render() {
-    const {
-      text
-    } = this.props
+  // Dig deeper when it is a number.
+  if (type === 'number') {
+    if (isNaN(value)) {
+      type = 'nan';
+    } else if (Number.isInteger(value)) {
+      type = 'integer';
+    } else {
+      type = 'float';
+    }
+  }
 
+  return type;
+}
+
+function createItems(obj, flatMap, { level = 0, inArray = false } = {}) {
+  return Object.entries(obj).map(([name, value]) => {
+    const type = getType(value);
+
+    const result = {
+      key: `${name}.${level}`,
+      name,
+      level,
+      type,
+      value: String(value),
+      inArray,
+    };
+
+    if (type === 'object') {
+      result.children = createItems(value, flatMap, {
+        level: level + 1,
+      });
+    }
+
+    if (type === 'array') {
+      result.children = createItems(value, flatMap, {
+        level: level + 1,
+        inArray: true,
+      });
+    }
+
+    return result;
+  });
+}
+
+function parseItems(src) {
+  const flatMap = {};
+  const items = createItems(src, flatMap);
+  return { items, flatMap };
+}
+
+function valueComponent(item) {
+  switch (item.type) {
+    default:
+      return <span style={styles[`value-${item.type}`]}>{item.value}</span>;
+
+    case 'string':
+      return <span style={styles['value-string']}>"{item.value}"</span>;
+
+    case 'object':
+      return (
+        <span>
+          <span style={styles.enclosingSign}>{'{'}</span>
+          <Tree src={item.children} />
+          <span style={styles.enclosingSign}>{'}'}</span>
+        </span>
+      );
+
+    case 'array':
+      return (
+        <span>
+          <span style={styles.enclosingSign}>{'['}</span>
+          <Tree src={item.children} />
+          <span style={styles.enclosingSign}>{']'}</span>
+        </span>
+      );
+  }
+}
+
+function nameComponent(item) {
+  if (item.inArray) {
     return (
-      <div className={styles.test}>
-        Example Component: {text}
-      </div>
-    )
+      <span style={styles.nameInArray}>
+        {item.name}
+        <span style={styles.nameColon}>:</span>
+      </span>
+    );
   }
+  return (
+    <span style={styles.name}>
+      {item.name}
+      <span style={styles.nameColon}>:</span>
+    </span>
+  );
+}
+
+function Tree({ src }) {
+  return src.map(item => {
+    const style = {
+      marginBottom: 3,
+    };
+    if (!!item.level) {
+      style.paddingLeft = 15;
+    }
+    return (
+      <div key={item.key} style={style}>
+        {nameComponent(item)}
+        {valueComponent(item)}
+      </div>
+    );
+  });
+}
+
+const styles = {
+  root: {
+    fontFamily: 'monospace',
+  },
+  name: {
+    color: 'rgb(0, 43, 54)',
+    letterSpacing: 0.5,
+  },
+  nameInArray: {
+    color: 'rgb(108, 113, 196)',
+    letterSpacing: 0.5,
+  },
+  nameColon: {
+    padding: '0px 3px',
+    opacity: 0.65,
+  },
+  enclosingSign: {
+    fontWeight: 'bold',
+  },
+  'value-string': {
+    color: 'rgb(203, 75, 22)',
+  },
+  'value-integer': {
+    color: 'rgb(38, 139, 210)',
+  },
+  'value-float': {
+    color: 'rgb(133, 153, 0)',
+  },
+  'value-nan': {
+    color: 'rgb(211, 54, 130)',
+    fontSize: 11,
+    fontWeight: 'bold',
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+  },
+  'value-null': {
+    color: 'rgb(211, 54, 130)',
+    fontSize: 11,
+    fontWeight: 'bold',
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+    textTransform: 'uppercase',
+  },
+  'value-undefined': {
+    color: 'rgb(88, 110, 117)',
+    fontSize: 11,
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+  },
+};
+
+export default function ObjViewer({ src }) {
+  const data = useRef();
+
+  const { items, flatMap } = parseItems(src);
+
+  data.current = {
+    prev: data.current && data.current.map,
+    map: flatMap,
+  };
+
+  return (
+    <div style={styles.root}>
+      <Tree src={items} />
+    </div>
+  );
 }
