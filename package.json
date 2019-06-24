@@ -1,10 +1,10 @@
 {
-  "name": "obj-viewer",
+  "name": "@matvp/react-simple-obj-view",
   "version": "1.0.0",
   "description": "",
   "author": "matvp91",
   "license": "MIT",
-  "repository": "matvp91/obj-viewer",
+  "repository": "matvp91/react-simple-obj-view",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
