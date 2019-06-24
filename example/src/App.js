@@ -10,6 +10,9 @@ const datasets = {
     nully: null,
     notdef: undefined,
     isnan: NaN,
+    func: () => {
+      console.log('I is func');
+    },
     structure: {
       prop: 'string now',
     },

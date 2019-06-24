@@ -1,9 +1,6 @@
 import React from 'react';
 
 const styles = {
-  root: {
-    fontFamily: 'monospace',
-  },
   name: {
     color: 'rgb(0, 43, 54)',
     letterSpacing: 0.5,
@@ -47,6 +44,13 @@ const styles = {
   },
   'value-undefined': {
     color: 'rgb(88, 110, 117)',
+    fontSize: 11,
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+  },
+  'value-function': {
+    color: 'rgb(0, 0, 120)',
     fontSize: 11,
     backgroundColor: 'rgb(235, 235, 235)',
     padding: '1px 2px',
@@ -115,6 +119,9 @@ function valueComponent(item) {
     default:
       return <span style={styles[`value-${item.type}`]}>{item.value}</span>;
 
+    case 'function':
+      return <span style={styles[`value-${item.type}`]}>function</span>;
+
     case 'string':
       return <span style={styles['value-string']}>"{item.value}"</span>;
 
@@ -174,9 +181,5 @@ function Tree({ src }) {
 
 export default function ObjViewer({ src }) {
   const items = createItems(src);
-  return (
-    <div style={styles.root}>
-      <Tree src={items} />
-    </div>
-  );
+  return <Tree src={items} />;
 }
