@@ -1,4 +1,58 @@
-import React, { useRef } from 'react';
+import React from 'react';
+
+const styles = {
+  root: {
+    fontFamily: 'monospace',
+  },
+  name: {
+    color: 'rgb(0, 43, 54)',
+    letterSpacing: 0.5,
+  },
+  nameInArray: {
+    color: 'rgb(108, 113, 196)',
+    letterSpacing: 0.5,
+  },
+  nameColon: {
+    padding: '0px 3px',
+    opacity: 0.65,
+  },
+  enclosingSign: {
+    fontWeight: 'bold',
+  },
+  'value-string': {
+    color: 'rgb(203, 75, 22)',
+  },
+  'value-integer': {
+    color: 'rgb(38, 139, 210)',
+  },
+  'value-float': {
+    color: 'rgb(133, 153, 0)',
+  },
+  'value-nan': {
+    color: 'rgb(211, 54, 130)',
+    fontSize: 11,
+    fontWeight: 'bold',
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+  },
+  'value-null': {
+    color: 'rgb(211, 54, 130)',
+    fontSize: 11,
+    fontWeight: 'bold',
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+    textTransform: 'uppercase',
+  },
+  'value-undefined': {
+    color: 'rgb(88, 110, 117)',
+    fontSize: 11,
+    backgroundColor: 'rgb(235, 235, 235)',
+    padding: '1px 2px',
+    borderRadius: 3,
+  },
+};
 
 function getType(value) {
   let type = typeof value;
@@ -26,7 +80,7 @@ function getType(value) {
   return type;
 }
 
-function createItems(obj, flatMap, { level = 0, inArray = false } = {}) {
+function createItems(obj, { level = 0, inArray = false } = {}) {
   return Object.entries(obj).map(([name, value]) => {
     const type = getType(value);
 
@@ -40,13 +94,13 @@ function createItems(obj, flatMap, { level = 0, inArray = false } = {}) {
     };
 
     if (type === 'object') {
-      result.children = createItems(value, flatMap, {
+      result.children = createItems(value, {
         level: level + 1,
       });
     }
 
     if (type === 'array') {
-      result.children = createItems(value, flatMap, {
+      result.children = createItems(value, {
         level: level + 1,
         inArray: true,
       });
@@ -54,12 +108,6 @@ function createItems(obj, flatMap, { level = 0, inArray = false } = {}) {
 
     return result;
   });
-}
-
-function parseItems(src) {
-  const flatMap = {};
-  const items = createItems(src, flatMap);
-  return { items, flatMap };
 }
 
 function valueComponent(item) {
@@ -124,70 +172,8 @@ function Tree({ src }) {
   });
 }
 
-const styles = {
-  root: {
-    fontFamily: 'monospace',
-  },
-  name: {
-    color: 'rgb(0, 43, 54)',
-    letterSpacing: 0.5,
-  },
-  nameInArray: {
-    color: 'rgb(108, 113, 196)',
-    letterSpacing: 0.5,
-  },
-  nameColon: {
-    padding: '0px 3px',
-    opacity: 0.65,
-  },
-  enclosingSign: {
-    fontWeight: 'bold',
-  },
-  'value-string': {
-    color: 'rgb(203, 75, 22)',
-  },
-  'value-integer': {
-    color: 'rgb(38, 139, 210)',
-  },
-  'value-float': {
-    color: 'rgb(133, 153, 0)',
-  },
-  'value-nan': {
-    color: 'rgb(211, 54, 130)',
-    fontSize: 11,
-    fontWeight: 'bold',
-    backgroundColor: 'rgb(235, 235, 235)',
-    padding: '1px 2px',
-    borderRadius: 3,
-  },
-  'value-null': {
-    color: 'rgb(211, 54, 130)',
-    fontSize: 11,
-    fontWeight: 'bold',
-    backgroundColor: 'rgb(235, 235, 235)',
-    padding: '1px 2px',
-    borderRadius: 3,
-    textTransform: 'uppercase',
-  },
-  'value-undefined': {
-    color: 'rgb(88, 110, 117)',
-    fontSize: 11,
-    backgroundColor: 'rgb(235, 235, 235)',
-    padding: '1px 2px',
-    borderRadius: 3,
-  },
-};
-
 export default function ObjViewer({ src }) {
-  const data = useRef();
-
-  const { items, flatMap } = parseItems(src);
-
-  data.current = {
-    prev: data.current && data.current.map,
-    map: flatMap,
-  };
-
+  const items = createItems(src);
   return (
     <div style={styles.root}>
       <Tree src={items} />
