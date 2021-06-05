@@ -16,14 +16,17 @@ const datasets = {
     },
     structure: {
       prop: 'string now',
+      excludeme: {
+        nested: true
+      }
     },
     list: [
       1,
       'hello',
       {
-        propnest: 'i am nested',
-      },
-    ],
+        propnest: 'i am nested'
+      }
+    ]
   },
   src2: {
     one: 'i am a string',
@@ -33,16 +36,16 @@ const datasets = {
     notdef: undefined,
     isnan: NaN,
     structure: {
-      prop: 'string now',
+      prop: 'string now'
     },
     list: [
       1,
       ['nested array'],
       {
-        propnest: 'i am nested',
-      },
-    ],
-  },
+        propnest: 'i am nested'
+      }
+    ]
+  }
 };
 
 export default class App extends Component {
@@ -50,20 +53,23 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      data: datasets.src1,
+      data: datasets.src1
     };
   }
 
   onClick = name => () => {
     this.setState({
-      data: datasets[name],
+      data: datasets[name]
     });
   };
 
   render() {
     return (
       <div>
-        <ExampleComponent src={this.state.data} />
+        <ExampleComponent
+          src={this.state.data}
+          redactKeys={['structure.excludeme']}
+        />
         <button onClick={this.onClick('src1')}>src1</button>
         <button onClick={this.onClick('src2')}>src2</button>
       </div>
