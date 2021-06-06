@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import wcmatch from 'wildcard-match';
 
 const MutationObserver =
   window.MutationObserver || window.WebKitMutationObserver;
@@ -224,20 +225,35 @@ export default function ObjViewer({ src, redactKeys = [] }) {
         if (mutation.target === ref.current) {
           return;
         }
-        const item = mutation.target.closest('[data-tree-item]');
-        const name = item ? item.querySelector('[data-tree-item-name]') : null;
-        if (name) {
-          name.style.backgroundColor = 'rgba(	173, 216, 230)';
-          name.style.transition = null;
-          setTimeout(() => {
-            if (!document.contains(name)) {
-              return;
-            }
-            const { backgroundColor, transition } = styles.nameText;
-            name.style.transition = transition;
-            name.style.backgroundColor = backgroundColor;
-          }, 100);
+
+        let item;
+        if (mutation.type === 'characterData') {
+          const { parentElement } = mutation.target;
+          const treeItem = parentElement.closest('[data-tree-item]');
+          if (treeItem) {
+            item = treeItem.querySelector('[data-tree-item-name]');
+          }
+        } else if (mutation.type === 'childList') {
+          const treeItem = mutation.target.closest('[data-tree-item]');
+          if (treeItem) {
+            item = treeItem.querySelector('[data-tree-item-name]');
+          }
         }
+
+        if (!item) {
+          return;
+        }
+
+        item.style.backgroundColor = 'rgba(	173, 216, 230)';
+        item.style.transition = null;
+        setTimeout(() => {
+          if (!document.contains(item)) {
+            return;
+          }
+          const { backgroundColor, transition } = styles.nameText;
+          item.style.transition = transition;
+          item.style.backgroundColor = backgroundColor;
+        }, 100);
       });
       return mutations;
     };
@@ -246,8 +262,8 @@ export default function ObjViewer({ src, redactKeys = [] }) {
     observer.observe(ref.current, {
       childList: true,
       subtree: true,
-      attributes: false,
-      characterData: false
+      attributes: true,
+      characterData: true
     });
 
     return () => {
@@ -256,7 +272,8 @@ export default function ObjViewer({ src, redactKeys = [] }) {
   }, []);
 
   const mutateItem = item => {
-    if (redactKeys.includes(item.id)) {
+    const redacted = redactKeys.some(value => wcmatch(value)(item.id));
+    if (redacted) {
       item.type = 'redacted';
     }
   };

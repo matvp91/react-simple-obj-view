@@ -10323,6 +10323,11 @@ widest-line@^2.0.0:
   dependencies:
     string-width "^2.1.1"
 
+wildcard-match@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/wildcard-match/-/wildcard-match-5.1.0.tgz#cb9d0c54a8bde298e534054146f3577f9e7b3c97"
+  integrity sha512-Q02fSwOl4xPEyLLMs3TiAOBD735ELrdiczcCnvYAn5VRDAycmzYzc69BmWI1MGONfngCSq+5mgIaYMoGfICqQg==
+
 window-size@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.0.tgz#5438cd2ea93b202efa3a19fe8887aee7c94f9c9d"

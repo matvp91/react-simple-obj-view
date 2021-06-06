@@ -6,14 +6,14 @@ const datasets = {
   src1: {
     one: 'i am a string',
     two: 12,
-    three: 123.22,
-    nully: null,
-    notdef: undefined,
-    isnan: NaN,
-    isbool: true,
-    func: () => {
-      console.log('I is func');
-    },
+    // three: 123.22,
+    // nully: null,
+    // notdef: undefined,
+    // isnan: NaN,
+    // isbool: true,
+    // func: () => {
+    //   console.log('I is func');
+    // },
     structure: {
       prop: 'string now',
       excludeme: {
@@ -24,25 +24,36 @@ const datasets = {
       1,
       'hello',
       {
-        propnest: 'i am nested'
+        test: {
+          redactme: 'unredacted'
+        }
       }
     ]
+    // list: [
+    //   1,
+    //   'hello',
+    //   {
+    //     propnest: 'i am nested'
+    //   }
+    // ]
   },
   src2: {
-    one: 'i am a string',
-    two: 12,
-    three: 111111,
-    nully: 'not null anymore',
-    notdef: undefined,
-    isnan: NaN,
+    one: 'i am a string too',
+    two: 13,
+    // three: 111111,
+    // nully: 'not null anymore',
+    // notdef: undefined,
+    // isnan: NaN,
     structure: {
       prop: 'string now'
     },
     list: [
-      1,
-      ['nested array'],
+      11,
+      'hello2',
       {
-        propnest: 'i am nested'
+        test: {
+          redactme: 'unredacted'
+        }
       }
     ]
   }
@@ -68,7 +79,7 @@ export default class App extends Component {
       <div>
         <ExampleComponent
           src={this.state.data}
-          redactKeys={['structure.excludeme']}
+          redactKeys={['structure.excludeme', 'list.*.test.redactme']}
         />
         <button onClick={this.onClick('src1')}>src1</button>
         <button onClick={this.onClick('src2')}>src2</button>
