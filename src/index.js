@@ -103,7 +103,7 @@ function getType(value) {
   return type;
 }
 
-function createItems(obj, { mutateItem, level, inArray, parentId }) {
+function createItems(obj, maxLevel, { mutateItem, level, inArray, parentId }) {
   return Object.entries(obj).map(([name, value]) => {
     const type = getType(value);
 
@@ -119,8 +119,12 @@ function createItems(obj, { mutateItem, level, inArray, parentId }) {
 
     mutateItem(result);
 
+    if (maxLevel > 0 && level > maxLevel) {
+      return result;
+    }
+
     if (type === 'object') {
-      result.children = createItems(value, {
+      result.children = createItems(value, maxLevel, {
         mutateItem,
         level: level + 1,
         inArray: false,
@@ -129,7 +133,7 @@ function createItems(obj, { mutateItem, level, inArray, parentId }) {
     }
 
     if (type === 'array') {
-      result.children = createItems(value, {
+      result.children = createItems(value, maxLevel, {
         mutateItem,
         level: level + 1,
         inArray: true,
@@ -216,7 +220,7 @@ function Tree({ src }) {
   });
 }
 
-export default function ObjViewer({ src, redactKeys = [] }) {
+export default function ObjViewer({ src, redactKeys = [], maxLevel = 0 }) {
   const ref = useRef();
 
   useLayoutEffect(() => {
@@ -278,7 +282,11 @@ export default function ObjViewer({ src, redactKeys = [] }) {
     }
   };
 
-  const items = createItems(src, { mutateItem, level: 0, inArray: false });
+  const items = createItems(src, maxLevel, {
+    mutateItem,
+    level: 0,
+    inArray: false
+  });
   return (
     <div ref={ref}>
       <Tree src={items} />
